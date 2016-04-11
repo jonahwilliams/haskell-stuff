@@ -13,3 +13,9 @@ Lists and Trees have been fun so far, but I fear I'll soon have to venture into
 something a bit more advanced.  I'm not really sure If I actually know how to
 write Heaps or RB Trees or if I've just memorized some code.  One way or another,
 I'll figure out how to do it in Haskell.
+
+At this point my code is probably more verbose than necessary; I'm aware of
+`.` and `$` but I'm not quite comfortable using them yet.  I also have hlint
+providing me some pro-tips on the DL.  `not (elem x)` -> `notElem x`, awesome.
+Probably would have taken me a year to find on my own, but I guess its a common
+enough pattern.
