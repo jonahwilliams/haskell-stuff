@@ -1,56 +1,41 @@
-type Board = [[Char]]
+import qualified Data.Map.Strict as Map
+import qualified Data.Maybe as Maybe
+
 type Coord = (Int, Int)
-
-data Node = Node { position :: Coord
-                 , visited  :: [Coord]
-                 , match    :: [Char]
-                 } deriving Show
-
--- Calculates valid neighbor positions given n x m dimensions of board
---  and i, j current position
-neighbors :: Int -> Int -> Coord -> [(Coord)]
-neighbors n m (i, j) = [(x, y) | x <- [(i - 1) .. (i + 1)],
-                            y <- [(j - 1) .. (j + 1)],
-                            x > -1,
-                            y > -1,
-                            x < n,
-                            y < m ]
-
--- Every position which has the correct starting character is turned into a
----  Node to start the recursive process.  we check every character in the board
-initial :: Board -> [Char] -> [Node]
-initial b []     = []
-initial b (c:cs) =
-  let n = (length b)
-      m = (length (b !! 0))
-      start = [(i, j) | i <- [0..(n - 1)],
-                        j <- [0..(m - 1)],
-                        ((b !! i) !! j) == c ]
-  in map (\c -> Node { position = c, visited = [c], match = cs }) start
-
--- given a board and a list of partialy matched nodes, find possible next nodes
--- return true if we completely match a word
-findWord :: Board -> [Node]  -> Bool
-findWord _ [] = False
-findWord _ ((Node { position = (i, j), visited = vs, match = []    }):xs) = True
-findWord b ((Node { position = (i, j), visited = vs, match = (c:cs)}):xs) =
-  let n = (length b)
-      m = (length (b !! 0))
-      predicate = \(x,y) -> (notElem (x,y) vs) && (((b !! x) !! y) == c)
-      raw = filter predicate (neighbors n m (i, j))
-      ns = map (\t -> Node { position = t, visited = t : vs, match = cs }) raw
-  in findWord b (xs ++ ns)
+type Board = Map.Map Char [Coord]
 
 
-testBoard :: Board
-testBoard = [
-  ['a', 'c', 'l', 'b'],
-  ['r', 'e', 'b', 'u'],
-  ['l', 'n', 'c', 's'],
-  ['c', 'm', 'n', 'o']]
+buildMap :: [[Char]] -> Board
+buildMap cs =
+   Map.fromListWith (++)
+    $ concat
+    $ map (\(ds, i) -> map (\(c, j) -> (c, [(i, j)]) )
+    $ zip ds [1..])
+    $ zip cs [1..]
 
-theDoot :: Board -> [Char] -> Bool
-theDoot _ [] = True
-theDoot b xs =
-  let starting = initial b xs
-  in findWord b starting
+
+isNeighbor :: Coord -> Coord -> Bool
+isNeighbor (i,j) (x,y) =
+  abs (i - x) < 2 && abs (j - y) < 2
+
+
+testBoard :: [[Char]]
+testBoard = [['a', 'c', 'l', 'b'],
+             ['r', 'e', 'b', 'u'],
+             ['l', 'n', 'c', 's'],
+             ['c', 'm', 'n', 'o']]
+
+findMatch :: Board -> [Char] -> Bool
+findMatch _ [] = True
+findMatch b (y:ys) =
+  or $ map (\z -> findMatch' b [z] ys)
+    $ Maybe.fromMaybe []
+    $ Map.lookup y b
+
+findMatch' :: Board -> [Coord] -> [Char] -> Bool
+findMatch' _ (x:xs) []     = True
+findMatch' b (x:xs) (y:ys) =
+  or $ map (\z -> findMatch' b (z:(x:xs)) ys)
+    $ filter (\z -> isNeighbor x z && notElem z (x:xs))
+    $ Maybe.fromMaybe []
+    $ Map.lookup y b
