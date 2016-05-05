@@ -1,3 +1,15 @@
+{-
+Given a matrix of characters like
+    [['a', 'c', 'l', 'b'],
+     ['r', 'e', 'b', 'u'],
+     ['l', 'n', 'c', 's'],
+     ['c', 'm', 'n', 'o']]
+
+determine if a given string like "care" can
+be found by navigating through the matrix without
+repeating characters - ie snake rules
+-}
+
 import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
 
