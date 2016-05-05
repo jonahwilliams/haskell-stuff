@@ -16,7 +16,7 @@ import qualified Data.Maybe as Maybe
 type Coord = (Int, Int)
 type Board = Map.Map Char [Coord]
 
-
+-- Flatten the initial board to a map from chars to a list of coordinates where they occur
 buildMap :: [[Char]] -> Board
 buildMap cs =
    Map.fromListWith (++)
@@ -24,10 +24,11 @@ buildMap cs =
     $ map (\(ds, i) -> map (\(c, j) -> (c, [(i, j)]) ) $ zip ds [1..])
     $ zip cs [1..]
 
-
+-- In order to handle the inital case where the visited nodes list is empty,
+--  compares a coord with the last visited node
 isNeighbor :: Coord -> [Coord] -> Bool
 isNeighbor (i,j) [] = True
-isNeighbor (i,j) ((x,y):xs) =
+isNeighbor (i,j) ((x,y):_) =
   abs (i - x) < 2 && abs (j - y) < 2
 
 
@@ -41,7 +42,7 @@ testBoard = [['a', 'c', 'l', 'b'],
 findMatch :: Board -> [Coord] -> [Char] -> Bool
 findMatch _ xs []     = True
 findMatch b xs (y:ys) =
-  or $ map (\z -> findMatch b (z:xs) ys)
-    $ filter (\z -> (isNeighbor z xs) && notElem z xs)
-    $ Maybe.fromMaybe []
-    $ Map.lookup y b
+  or $ map (\z -> findMatch b (z:xs) ys)                -- [Bool]
+    $ filter (\z -> (isNeighbor z xs) && notElem z xs)  -- [Coord]
+    $ Maybe.fromMaybe []                                -- [Coord]
+    $ Map.lookup y b                                    -- Maybe [Coord]
