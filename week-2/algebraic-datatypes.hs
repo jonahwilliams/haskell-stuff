@@ -298,3 +298,16 @@ main = do
   testPostorder
   testInOrder
   testFoldTree
+
+
+-- Exercises
+
+data Weekday =
+   Monday
+ | Tuesday
+ | Wednesday
+ | Thursday
+ | Friday
+
+-- f Friday = "Miller Time"
+-- f :: Weekday -> String
