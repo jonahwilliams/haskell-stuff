@@ -21,13 +21,13 @@ buildMap :: [[Char]] -> Board
 buildMap cs =
    Map.fromListWith (++)
     $ concat
-    $ map (\(ds, i) -> map (\(c, j) -> (c, [(i, j)]) )
-    $ zip ds [1..])
+    $ map (\(ds, i) -> map (\(c, j) -> (c, [(i, j)]) ) $ zip ds [1..])
     $ zip cs [1..]
 
 
-isNeighbor :: Coord -> Coord -> Bool
-isNeighbor (i,j) (x,y) =
+isNeighbor :: Coord -> [Coord] -> Bool
+isNeighbor (i,j) [] = True
+isNeighbor (i,j) ((x,y):xs) =
   abs (i - x) < 2 && abs (j - y) < 2
 
 
@@ -37,17 +37,11 @@ testBoard = [['a', 'c', 'l', 'b'],
              ['l', 'n', 'c', 's'],
              ['c', 'm', 'n', 'o']]
 
-findMatch :: Board -> [Char] -> Bool
-findMatch _ [] = True
-findMatch b (y:ys) =
-  or $ map (\z -> findMatch' b [z] ys)
-    $ Maybe.fromMaybe []
-    $ Map.lookup y b
 
-findMatch' :: Board -> [Coord] -> [Char] -> Bool
-findMatch' _ (x:xs) []     = True
-findMatch' b (x:xs) (y:ys) =
-  or $ map (\z -> findMatch' b (z:(x:xs)) ys)
-    $ filter (\z -> isNeighbor x z && notElem z (x:xs))
+findMatch :: Board -> [Coord] -> [Char] -> Bool
+findMatch _ xs []     = True
+findMatch b xs (y:ys) =
+  or $ map (\z -> findMatch b (z:xs) ys)
+    $ filter (\z -> (isNeighbor z xs) && notElem z xs)
     $ Maybe.fromMaybe []
     $ Map.lookup y b
