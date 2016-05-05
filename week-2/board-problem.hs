@@ -32,14 +32,14 @@ initial b (c:cs) =
 -- return true if we completely match a word
 findWord :: Board -> [Node]  -> Bool
 findWord _ [] = False
-findWord _ (Node { position = (i, j), visited = vs, match = []    }):xs = True
-findWord b (Node { position = (i, j), visited = vs, match = (c:cs)}):xs =
+findWord _ ((Node { position = (i, j), visited = vs, match = []    }):xs) = True
+findWord b ((Node { position = (i, j), visited = vs, match = (c:cs)}):xs) =
   let n = (length b)
       m = (length (b !! 0))
-      predicate = \(x,y) -> and [(notElem (x,y) vs), (((b !! x) !! y) == c)]
+      predicate = \(x,y) -> (notElem (x,y) vs) && (((b !! x) !! y) == c)
       raw = filter predicate (neighbors n m (i, j))
       ns = map (\t -> Node { position = t, visited = t : vs, match = cs }) raw
-  in findSolution b (xs ++ ns)
+  in findWord b (xs ++ ns)
 
 
 testBoard :: Board
